@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Secrets / local config
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Market data / replay artifacts
+data/raw/
+data/derived/
+data/cache/
+*.zst
+*.gz
+*.parquet
+*.feather
+*.db
+*.sqlite
+*.sqlite3
+
+# Notebooks / local output
+.ipynb_checkpoints/
+outputs/
+artifacts/
+logs/
+
+# macOS / editors
+.DS_Store
+.vscode/
+.idea/
