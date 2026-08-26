@@ -1,0 +1,40 @@
+SKYLIT RE — BUNDLE AUDIT
+======================================================================
+Fichiers analysés : 72
+
+falcon             files=  3 occurrences=   40
+heatseeker         files=  6 occurrences=   50
+flowseeker         files=  8 occurrences=   94
+midas              files=  2 occurrences=   36
+atlas              files=  3 occurrences=   44
+talon              files=  5 occurrences=  136
+athena             files=  0 occurrences=    0
+aegis              files=  4 occurrences=   11
+metrics            files= 11 occurrences=   68
+armed_fire         files=  8 occurrences=  126
+gex_vex            files= 20 occurrences=  257
+king_gatekeeper    files= 22 occurrences=  318
+agentzero          files=  2 occurrences=   60
+
+BUNDLES MULTI-MODULES
+======================================================================
+1536-064f08115df39c50.js                      -> aegis, agentzero, armed_fire, atlas, falcon, flowseeker, gex_vex, heatseeker, king_gatekeeper, metrics, midas, talon
+7297-f12effc5f786481c.js                      -> aegis, armed_fire, atlas, falcon, flowseeker, king_gatekeeper, midas, talon
+layout-f8c87dfd0b87bada.js                    -> aegis, atlas, falcon, flowseeker, gex_vex, heatseeker, talon
+page-ee729ac9decf605c.js                      -> flowseeker, gex_vex, heatseeker, king_gatekeeper, talon
+4712-c51afc57ca55d292.js                      -> aegis, flowseeker, gex_vex, king_gatekeeper
+8593-0b7dc0fa05075470.js                      -> agentzero, gex_vex, king_gatekeeper, talon
+144d3bae-2dd2a6d890344e42.js                  -> armed_fire, king_gatekeeper, metrics
+1576-b802384d65dd427f.js                      -> gex_vex, king_gatekeeper, metrics
+181-88cba17a6dc8c325.js                       -> armed_fire, gex_vex, king_gatekeeper
+4338-2835906ea9e42f40.js                      -> armed_fire, gex_vex, metrics
+5485-08719a466b890540.js                      -> armed_fire, gex_vex, king_gatekeeper
+6898-c7df98ceb01066ec.js                      -> gex_vex, heatseeker, king_gatekeeper
+7187-dbf517257821735b.js                      -> flowseeker, heatseeker, metrics
+7945-f6d188ac1d59a0f4.js                      -> gex_vex, heatseeker, king_gatekeeper
+5368-05ddc984de4127bf.js                      -> gex_vex, king_gatekeeper
+6514-bd56272b2716d98c.js                      -> king_gatekeeper, metrics
+6614-bb93312999c77658.js                      -> armed_fire, metrics
+7026-d5f1da6b0d5e5c29.js                      -> gex_vex, metrics
+9832-3e591358ebdb25b9.js                      -> flowseeker, metrics
+988-7c66963a05bdd0b2.js                       -> flowseeker, gex_vex

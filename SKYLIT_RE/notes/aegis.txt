@@ -1,0 +1,53 @@
+
+==========================================================================================
+FILE: 7297-f12effc5f786481c.js
+MATCHES: 4
+==========================================================================================
+
+[1] line≈1 offset=29492 match='Aegis'
+ll}(e,(0,i.O)(e=>e.accountBalance),(0,i.O)(e=>e.riskPct))}function S(e){let{sizing:t,dayLabel:n,t:a,skin:r}=e;if(t.allExceedBudget||0===t.gradedCount)return(0,l.jsxs)("div",{className:"flex flex-wrap items-baseline gap-x-1.5",style:{fontSize:11,color:a.textMuted,fontVariantNumeric:"tabular-nums"},title:"Sized to your account (balance \xd7 risk% in Aegis). No trade this day fits your risk budget — raise balance or lower risk% to size the day.",children:[(0,l.jsx)("b",{style:{color:a.textSecondary,fontWeight:700,letterSpacing:"0.04em",textTransform:"uppercase",fontSize:9,fontFamily:"Inter, ui-sans-serif, system-ui, sans-serif"},children:"Daily"}),n&&(0,l.jsxs)("span",{children:[n," \xb7"]}),(0,l.js
+
+[2] line≈1 offset=30183 match='Aegis'
+b7"]}),(0,l.jsx)("span",{children:"— raise balance / lower risk to size"})]});let o=t.totalUsd>=0,s=o?r.bull:a.textMuted;return(0,l.jsxs)("div",{className:"flex flex-wrap items-baseline gap-x-1.5",style:{fontSize:11,color:a.textMuted,fontVariantNumeric:"tabular-nums"},title:"What you'd have made this day at your account size (balance \xd7 risk% in Aegis) — the day's realized $ summed over its trades, each independently risk-sized, and that total as % account growth. Over-budget trades count $0.",children:[(0,l.jsx)("b",{style:{color:a.textSecondary,fontWeight:700,letterSpacing:"0.04em",textTransform:"uppercase",fontSize:9,fontFamily:"Inter, ui-sans-serif, system-ui, sans-serif"},children:"Daily"}
+
+[3] line≈1 offset=31352 match='Aegis'
+)]})]})}function j(e){let{sizing:t,t:n,skin:a}=e;return t.exceedsBudget?(0,l.jsxs)("div",{className:"mt-1.5 flex items-center gap-1",style:{fontSize:9.5,color:n.textMuted,fontVariantNumeric:"tabular-nums"},title:"One lot's full scale-in exceeds your risk budget of $".concat(k(t.riskBudget)," (balance \xd7 risk%). Increase balance or raise risk% in Aegis to size this trade — no position is shown rather than a phantom loss."),children:[(0,l.jsx)("span",{style:{color:a.warn,fontWeight:600},children:"over budget"}),(0,l.jsx)("span",{children:"\xb7 raise balance or risk% to size this"})]}):(0,l.jsxs)("div",{className:"mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5",style:{fontSize:9.5,color:n.
+
+[4] line≈1 offset=31804 match='Aegis'
+n",{style:{color:a.warn,fontWeight:600},children:"over budget"}),(0,l.jsx)("span",{children:"\xb7 raise balance or risk% to size this"})]}):(0,l.jsxs)("div",{className:"mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5",style:{fontSize:9.5,color:n.textMuted,fontVariantNumeric:"tabular-nums"},title:"Sized to your account (balance \xd7 risk% in Aegis). Contracts per tranche \xb7 premium deployed at your size.",children:[(0,l.jsxs)("span",{children:[(0,l.jsx)("b",{style:{color:n.textSecondary,fontWeight:700},children:t.lots})," ",1===t.lots?"contract":"contracts"]}),(0,l.jsxs)("span",{children:["\xb7 ",(0,l.jsxs)("b",{style:{color:n.textSecondary,fontWeight:600},children:["$",k(t.atRiskUsd)]}),
+
+==========================================================================================
+FILE: 4712-c51afc57ca55d292.js
+MATCHES: 2
+==========================================================================================
+
+[1] line≈1 offset=149 match='aegis'
+"use strict";(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[4712],{1910:(e,t,n)=>{n.d(t,{VZ:()=>l,g2:()=>i,mq:()=>a,vX:()=>r});let r="data-aegis-root",l="data-aegis-portal",o="[".concat(r,"], [").concat(l,"]");function a(e){return!!e&&"function"==typeof e.closest&&!!e.closest(o)}function i(){let e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:document,t=e.activeElement;return!!t&&t!==e.body&&a(t)}},2941:(e,t,n)=>{n.d(t,{Qs:()=>c});var r=n(12115),l=n(37883),o=n(87358);let a="flow-s
+
+[2] line≈1 offset=169 match='aegis'
+"use strict";(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[4712],{1910:(e,t,n)=>{n.d(t,{VZ:()=>l,g2:()=>i,mq:()=>a,vX:()=>r});let r="data-aegis-root",l="data-aegis-portal",o="[".concat(r,"], [").concat(l,"]");function a(e){return!!e&&"function"==typeof e.closest&&!!e.closest(o)}function i(){let e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:document,t=e.activeElement;return!!t&&t!==e.body&&a(t)}},2941:(e,t,n)=>{n.d(t,{Qs:()=>c});var r=n(12115),l=n(37883),o=n(87358);let a="flow-subgraph",i=new Map;f
+
+==========================================================================================
+FILE: 1536-064f08115df39c50.js
+MATCHES: 4
+==========================================================================================
+
+[1] line≈1 offset=65005 match='Aegis'
+==(r=l.author)?void 0:r.avatarUrl}}(n&&!l);if(!h||l||o||t&&p||p&&(null==m?void 0:m.startsWith("/dojo")))return null;let _=null!=f?f:d,E=_?{left:"".concat(_.x,"px"),top:"".concat(_.y,"px")}:t?{top:"60vh",right:"16px"}:{bottom:"".concat(84,"px"),right:"24px"};return(0,r.jsxs)("button",{onPointerDown:N,onPointerMove:T,onPointerUp:A,"aria-label":"Open Aegis","data-testid":"glitch-bubble",className:"glitch-bubble fixed flex items-center justify-center hover:scale-[1.04] active:scale-[0.98]",style:{zIndex:9989,width:"".concat(g,"px"),height:"".concat(g,"px"),borderRadius:"9999px",background:"linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(5, 10, 18, 0.96))",border:"1px solid rgba(147, 197, 253, 0.
+
+[2] line≈1 offset=241036 match='Aegis'
+ersal sniper (SPX \xb7 SPY \xb7 QQQ)",what:"Falcon snipes intraday reversals in 0DTE index options across the S&P and Nasdaq — the same setup priced in SPX, SPY and QQQ. It fades exhaustion into a gamma floor or ceiling and rides a managed exit; every card is one signal, not a version you have to configure.",how:"Set your balance and risk% once in Aegis — it sizes every entry into contracts and dollars on the card. Falcon scales in equal-weight: a probe plus adds at the triggers shown in the plan, with the running average updating on each fill. Copy the timestamped events in Copilot Mode to follow the managed exit.",t:u,skin:rS}),(0,r.jsxs)("div",{className:"flex min-h-0 flex-1 flex-col gap-1.5 o
+
+[3] line≈1 offset=383997 match='Aegis'
+tions — same-day expiry, equal-weight scale-in",what:"Peregrine trades 0DTE options on individual names, same-day expiry, in the same equal-weight scale-in style as Falcon. It only fires in the intraday-volatility regimes where the edge holds — the regime gate stands down when conditions turn to slow grind.",how:"Set your balance and risk% once in Aegis — it sizes every entry into contracts and dollars on the card. Peregrine scales in equal-weight: a probe plus adds at the shown triggers, with the running average updating on each fill. Copy the timestamped events in Copilot Mode to follow the managed exit.",t:h,skin:aS}),(0,r.jsxs)("div",{className:"flex min-h-0 flex-1 flex-col gap-1.5 overflow-y
+
+[4] line≈1 offset=447849 match='Aegis'
+rent",border:"none",cursor:"pointer"},onMouseEnter:e=>{e.currentTarget.style.backgroundColor=P.Tj.bgOpacity.medium(k)},onMouseLeave:e=>{e.currentTarget.style.backgroundColor="transparent"},children:[(0,r.jsx)(u.A,{size:14,style:{color:P.qd.muted(k)}}),(0,r.jsx)("span",{style:{fontSize:"12px",fontFamily:P.Il.font.ui,color:P.qd.primary(k)},children:"Aegis"}),(0,r.jsx)("span",{style:{marginLeft:"auto",fontSize:"10px",fontFamily:P.Il.font.ui,color:q?P.qd.muted(k):"#22c55e"},children:q?"OFF":"ON"})]}),(0,r.jsxs)("button",{onClick:()=>H(!V),className:"w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",style:{backgroundColor:"transparent",border:"none",cursor:"pointer"},onMouseEnter:
+
+==========================================================================================
+FILE: layout-f8c87dfd0b87bada.js
+MATCHES: 1
+==========================================================================================
+
+[1] line≈1 offset=23279 match='aegis'
+(void 0);return(0,a.useEffect)(()=>{void 0!==e&&(!e||t)&&X.Af.getState().claimForUser(e?t:null)},[e,t]),(0,a.useEffect)(()=>{!0===r.current&&!1===e&&((0,J.hk)(),y.q.removeQueries({queryKey:["tv-drawings"]}),y.q.removeQueries({queryKey:["tv-presets"]}),X.Af.getState().claimForUser(null)),r.current=e},[e]),null}var K=r(8269),Q=r(47821);let $="skylit:aegis:last-login-session";function Z(){let{isLoaded:e,isSignedIn:t,sessionId:r}=(0,j.d)(),{isAdmin:n,roles:i=[],isLoading:o}=(0,K.$)();return(0,a.useEffect)(()=>{if(e&&t&&r&&!o&&function(){try{return window.localStorage.getItem($)}catch(e){return null}}()!==r){try{window.localStorage.setItem($,r)}catch(e){}(0,k.b)(i,{isAdmin:n})&&Q.O.getState().setBubbl

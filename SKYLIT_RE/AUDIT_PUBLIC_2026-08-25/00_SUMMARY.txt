@@ -1,0 +1,21 @@
+SKYLIT PUBLIC FRONTEND AUDIT
+Date: 2026-08-25
+
+JS analysés: 428
+JS actuels téléchargés: 72
+Hits prioritaires: 8295
+Modules Webpack détectés: 3282
+Endpoints détectés: 531
+
+Hits par famille:
+  FALCON_ARMED: 1503
+  FLOWSEEKER: 513
+  GATEKEEPER: 1049
+  HEATSEEKER: 4552
+  TRINITY: 678
+
+Périmètre:
+- frontend public uniquement
+- aucun token/cookie collecté
+- aucune tentative de contournement d'authentification
+- API privées non interrogées

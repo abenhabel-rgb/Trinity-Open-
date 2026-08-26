@@ -1,0 +1,5 @@
+/peregrine
+/peregrine.png
+/peregrine/plcurve?strategy=
+/peregrine/search?q=
+/peregrine/stats?strategy=
