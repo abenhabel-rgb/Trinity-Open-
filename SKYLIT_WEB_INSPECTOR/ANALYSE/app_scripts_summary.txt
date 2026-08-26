@@ -1,0 +1,8 @@
+Skylit app scripts inventory
+Date: Wed Aug 26 08:54:27 CEST 2026
+App path: /Users/benhabel/Desktop/SKYLIT_WEB_INSPECTOR/RAW/SKYLIT_MIRROR/app.skylit.ai
+JavaScript files: 79
+JavaScript bytes: 5652832
+JavaScript MiB: 5.39
+
+Inventory: /Users/benhabel/Desktop/SKYLIT_WEB_INSPECTOR/ANALYSE/app_scripts_inventory.txt

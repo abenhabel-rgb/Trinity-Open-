@@ -1,0 +1,43 @@
+# skylit.ai — production robots.txt
+# Policy: allow all traditional search + AI crawlers.
+# AI bots are declared explicitly (not relying on the wildcard) so the decision
+# is unambiguous and future re-scoping happens in one place.
+
+User-agent: *
+Allow: /
+
+# --- Traditional search ---
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# --- OpenAI ---
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# --- Anthropic ---
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+# --- Perplexity ---
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+Sitemap: https://www.skylit.ai/sitemap.xml

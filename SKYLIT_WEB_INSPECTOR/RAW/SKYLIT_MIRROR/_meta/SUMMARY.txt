@@ -1,0 +1,11 @@
+Skylit frontend mirror
+Started UTC: 2026-08-26T06:42:45.588242+00:00
+Ended UTC:   2026-08-26T06:47:29.292419+00:00
+OK files:    617
+Errors:      169
+Seen URLs:   786
+Total bytes: 86959093 (82.93 MiB)
+Root:        /Users/benhabel/Desktop/SKYLIT_WEB_INSPECTOR/RAW/SKYLIT_MIRROR
+
+Scope: frontend/public resources only. No backend source, cookies, API keys,
+private databases, or authenticated API payloads are captured by this script.
