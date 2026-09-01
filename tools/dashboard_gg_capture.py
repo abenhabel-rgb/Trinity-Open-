@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capture observed Dashboard.gg Discord panels from Safari on macOS.
+"""Capture observed Dashcord Discord panels from Safari on macOS.
 
 The collector is intentionally observational: it reads text already rendered in the
 user's Safari session. It does not log in, call private APIs, or reconstruct missing
@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Iterable
 
 DEFAULT_CHANNELS = ("uw-premium-bot", "volume-spike")
-URL_FRAGMENT = "dashboard.gg/dashboard"
+URL_FRAGMENT = "dashcord.gg"
 TIME_RE = re.compile(r"\b([01]?\d|2[0-3]):[0-5]\d(?::[0-5]\d)?\b")
 TICKER_RE = re.compile(r"(?:^|\s|\$)([A-Z]{1,6})(?=\s|$|\b)")
 ALERT_RE = re.compile(
@@ -78,22 +78,38 @@ def _run_osascript(script: str) -> str:
 
 
 def read_dashboard_page(url_fragment: str = URL_FRAGMENT) -> SafariPage:
-    # ASCII record separator keeps URL and page text unambiguous.
+    """Find a matching Safari tab across all windows and read rendered body text."""
     sep = "__OPENCLAW_PAGE_SEP__"
     fragment = url_fragment.replace('"', '\\"')
     js = "document.body ? document.body.innerText : ''"
     script = f'''
     tell application "Safari"
-        if (count of documents) is 0 then error "Safari has no open documents"
-        repeat with d in documents
-            try
-                set u to URL of d
-                if u contains "{fragment}" then
-                    set bodyText to do JavaScript "{js}" in d
-                    return u & "{sep}" & bodyText
-                end if
-            end try
+        if (count of windows) is 0 then error "Safari has no open windows"
+
+        -- Safari's 'documents' collection can omit tabs in some window/tab-group
+        -- states. Iterate every tab of every window explicitly.
+        repeat with w in windows
+            repeat with t in tabs of w
+                try
+                    set u to URL of t
+                    if u contains "{fragment}" then
+                        set bodyText to do JavaScript "{js}" in t
+                        return u & "{sep}" & bodyText
+                    end if
+                end try
+            end repeat
         end repeat
+
+        -- Fallback: if the visible front tab is the target, try it directly.
+        try
+            set d to front document
+            set u to URL of d
+            if u contains "{fragment}" then
+                set bodyText to do JavaScript "{js}" in d
+                return u & "{sep}" & bodyText
+            end if
+        end try
+
         error "No Safari tab matched {fragment}"
     end tell
     '''
@@ -105,7 +121,7 @@ def read_dashboard_page(url_fragment: str = URL_FRAGMENT) -> SafariPage:
 
 
 def extract_channel_sections(text: str, channels: Iterable[str]) -> dict[str, str]:
-    """Best-effort split of Dashboard.gg body text by channel headings.
+    """Best-effort split of Dashcord body text by channel headings.
 
     Raw snapshots are always preserved, so parser improvements can be applied later
     without changing the historical observation.
@@ -133,8 +149,6 @@ def split_message_blocks(section: str) -> list[str]:
     blocks: list[list[str]] = []
     current: list[str] = []
     for line in lines:
-        # Dashboard bot rows normally expose a displayed HH:MM or HH:MM:SS time.
-        # Treat a new timed line as a likely message boundary.
         if current and TIME_RE.search(line):
             blocks.append(current)
             current = [line]
@@ -172,7 +186,6 @@ def normalize_blocks(
         time_match = TIME_RE.search(block)
         ticker = infer_ticker(block)
         alert_type = infer_alert_type(block)
-        # Skip heading-only/navigation fragments while retaining actual bot/card text.
         if not time_match and not ticker and not alert_type:
             continue
         stable = f"{channel}\n{block}".encode("utf-8", errors="replace")
@@ -270,7 +283,7 @@ def capture_once(args: argparse.Namespace, seen: set[str], hashes: dict[str, str
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Capture observed Dashboard.gg channel text from an existing Safari session."
+        description="Capture observed Dashcord channel text from an existing Safari session."
     )
     parser.add_argument("--channels", nargs="+", default=list(DEFAULT_CHANNELS))
     parser.add_argument("--interval", type=float, default=5.0, help="poll interval in seconds")
@@ -294,7 +307,7 @@ def main() -> int:
     seen = existing_event_ids(args.events_csv)
     hashes: dict[str, str] = {}
     print(
-        "OpenClaw Dashboard.gg capture started | "
+        "OpenClaw Dashcord capture started | "
         f"channels={','.join(args.channels)} | interval={args.interval:g}s"
     )
     print(f"raw={args.raw_root} | events={args.events_csv}")
