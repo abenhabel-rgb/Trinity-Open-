@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *.so
+*.egg-info/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -14,6 +15,7 @@ venv/
 !.env.example
 *.pem
 *.key
+.openclaw_vps_state
 
 # Market data / replay artifacts
 data/raw/
@@ -32,6 +34,7 @@ data/cache/
 outputs/
 artifacts/
 logs/
+reports/
 
 # macOS / editors
 .DS_Store
