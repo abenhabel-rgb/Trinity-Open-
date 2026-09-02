@@ -1,48 +1,37 @@
 {
   "date": "2026-08-24",
   "review_type": "manual_visual_observed_only",
-  "status": "partial",
+  "status": "corrected_partial",
+  "correction": {
+    "reason": "User explicitly confirmed that the displayed images are not Heatseeker cards.",
+    "supersedes": "Previous assistant classification of sheet #10 as a strong Heatseeker candidate.",
+    "policy": "User-confirmed product identity overrides visual similarity heuristics."
+  },
   "reviewed_sheet_numbers": [1,2,3,4,5,6,7,8,9,10,11,12,13,14],
   "pending_sheet_numbers": [15,16],
   "confirmed_heatseeker": [],
-  "strong_heatseeker_candidates": [
-    {
-      "sheet_number": 10,
-      "basename": "11_Screenshot_2026-08-24_at_9.26.43_AM.png",
-      "classification": "strong_heatseeker_candidate",
-      "confidence": "high",
-      "observed_evidence": [
-        "Discord message includes 'Bullish structure now' and 'updating you on the map changes'",
-        "embedded image shows a colored strike ladder / heatmap-like structure",
-        "embedded lower chart shows an SPXW-labelled map with colored dot bands around price",
-        "visible Discord time candidate: 8:31 AM"
-      ],
-      "filename_time_naive": "09:26:43",
-      "visible_content_time_candidate": "08:31",
-      "timezone_status": "unresolved",
-      "underlying_candidate": "SPXW",
-      "note": "Visually compatible with Heatseeker; exact Skylit product identity remains unconfirmed until corroborated by a known Heatseeker reference image."
-    }
-  ],
+  "strong_heatseeker_candidates": [],
   "rejected_non_heatseeker": [
-    {"sheet_number":1,"basename":"01_Screenshot_2026-08-24_at_10.49.51_AM.png","reason":"TradingView educational trigger chart / Discord post"},
-    {"sheet_number":2,"basename":"02_Screenshot_2026-08-24_at_10.49.35_AM.png","reason":"TradingView educational trigger chart / Discord post"},
-    {"sheet_number":3,"basename":"03_Screenshot_2026-08-24_at_10.49.12_AM.png","reason":"TradingView educational trigger chart / Discord post"},
-    {"sheet_number":4,"basename":"04_F33B4A68-2A56-4E11-9C37-C114870906B7.jpg","reason":"performance/P&L line chart, not a Heatseeker map"},
-    {"sheet_number":5,"basename":"05_IMG_1041.png","reason":"performance/P&L line chart, not a Heatseeker map"},
-    {"sheet_number":6,"basename":"07_image0.jpg","reason":"broker position/open-market-gain table"},
-    {"sheet_number":7,"basename":"08_968C37AF-239B-4D32-BBA1-07719E41B975.png","reason":"order fills table"},
-    {"sheet_number":8,"basename":"09_B44D5DC9-4275-49E4-B235-2BF58E24EF5B.png","reason":"performance/P&L line chart, not a Heatseeker map"},
-    {"sheet_number":9,"basename":"10_Screenshot_2026-08-24_at_9.27.03_AM.png","reason":"Discord trade P&L/position screenshots"},
-    {"sheet_number":11,"basename":"15_image0.jpg","reason":"broker position/open-market-gain table"},
-    {"sheet_number":12,"basename":"16_Screenshot_2026-08-24_at_11.46.37_AM.png","reason":"broker position screen"},
-    {"sheet_number":13,"basename":"17_share_7957644332781040723.png","reason":"broker account overview / balances / P&L"},
-    {"sheet_number":14,"basename":"20_Screenshot_2026-08-24_at_11.40.32_AM.png","reason":"broker position screen"}
+    {"sheet_number":1,"basename":"01_Screenshot_2026-08-24_at_10.49.51_AM.png","reason":"user-confirmed non-Heatseeker; TradingView educational trigger chart / Discord post"},
+    {"sheet_number":2,"basename":"02_Screenshot_2026-08-24_at_10.49.35_AM.png","reason":"user-confirmed non-Heatseeker; TradingView educational trigger chart / Discord post"},
+    {"sheet_number":3,"basename":"03_Screenshot_2026-08-24_at_10.49.12_AM.png","reason":"user-confirmed non-Heatseeker; TradingView educational trigger chart / Discord post"},
+    {"sheet_number":4,"basename":"04_F33B4A68-2A56-4E11-9C37-C114870906B7.jpg","reason":"user-confirmed non-Heatseeker; performance/P&L line chart"},
+    {"sheet_number":5,"basename":"05_IMG_1041.png","reason":"user-confirmed non-Heatseeker; performance/P&L line chart"},
+    {"sheet_number":6,"basename":"07_image0.jpg","reason":"user-confirmed non-Heatseeker; broker position/open-market-gain table"},
+    {"sheet_number":7,"basename":"08_968C37AF-239B-4D32-BBA1-07719E41B975.png","reason":"user-confirmed non-Heatseeker; order fills table"},
+    {"sheet_number":8,"basename":"09_B44D5DC9-4275-49E4-B235-2BF58E24EF5B.png","reason":"user-confirmed non-Heatseeker; performance/P&L line chart"},
+    {"sheet_number":9,"basename":"10_Screenshot_2026-08-24_at_9.27.03_AM.png","reason":"user-confirmed non-Heatseeker; Discord trade P&L/position screenshots"},
+    {"sheet_number":10,"basename":"11_Screenshot_2026-08-24_at_9.26.43_AM.png","reason":"user-confirmed non-Heatseeker; previous visual similarity classification withdrawn"},
+    {"sheet_number":11,"basename":"15_image0.jpg","reason":"user-confirmed non-Heatseeker; broker position/open-market-gain table"},
+    {"sheet_number":12,"basename":"16_Screenshot_2026-08-24_at_11.46.37_AM.png","reason":"user-confirmed non-Heatseeker; broker position screen"},
+    {"sheet_number":13,"basename":"17_share_7957644332781040723.png","reason":"user-confirmed non-Heatseeker; broker account overview / balances / P&L"},
+    {"sheet_number":14,"basename":"20_Screenshot_2026-08-24_at_11.40.32_AM.png","reason":"user-confirmed non-Heatseeker; broker position screen"}
   ],
   "data_policy": "observed_only",
   "rules": [
     "No filename timestamp is promoted to market time without timezone proof.",
     "No review_required image is automatically treated as Heatseeker.",
-    "Visual product identity is recorded separately from OCR guesses."
+    "User-confirmed product identity overrides visual similarity heuristics.",
+    "Images found in a Heatseeker/heatmap-labelled folder are candidates only, not confirmed Heatseeker cards."
   ]
 }
