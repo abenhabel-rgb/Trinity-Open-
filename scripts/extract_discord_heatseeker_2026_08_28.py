@@ -7,13 +7,21 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Allow execution directly from a fresh git checkout without installing the
+# package first. Resolve the repository path from this script itself rather
+# than assuming /tmp/Trinity-Open-.
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SRC = REPO_ROOT / 'src'
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
 from trinity.heatseeker_matrix_parser import parse_capture_filename_time, parse_ocr_result, seconds_between_naive
 
 ROOT = Path('/Volumes/OPENCLAW/OpenClaw_Metadata/discord_heatseeker_2026-08-28_review')
 MANIFEST = ROOT / 'manifest.jsonl'
 CACHE = ROOT / 'ocr_cache'
 OUT = ROOT / 'extracted'
-SWIFT = Path('/tmp/Trinity-Open-/scripts/heatseeker_ocr.swift')
+SWIFT = REPO_ROOT / 'scripts' / 'heatseeker_ocr.swift'
 
 
 def run_ocr(image: str, cache_path: Path) -> dict:
