@@ -1,9 +1,9 @@
 """Build the canonical observed-only Heatseeker image manifest.
 
-The ingest ledger is append-only and may contain repeated transfers.  This
+The ingest ledger is append-only and may contain repeated transfers. This
 module collapses those records by SHA-256, explicitly excludes known synthetic
-health-check images, and extracts only metadata that can be read from filenames
-without guessing a timezone or ticker.
+health-check images and known non-session website assets, and extracts only
+metadata that can be read from filenames without guessing a timezone or ticker.
 """
 
 from __future__ import annotations
@@ -18,7 +18,11 @@ from pathlib import Path
 from typing import Any
 
 
-KNOWN_TEST_FILENAMES = {"test_heatseeker.png"}
+KNOWN_EXCLUSIONS = {
+    "test_heatseeker.png": "synthetic_healthcheck_image",
+    "heatseeker-trinity.webp": "skylit_website_module_asset",
+    "heatseeker-swing.webp": "skylit_website_module_asset",
+}
 
 _SCREENSHOT_RE = re.compile(
     r"(?P<date>\d{4}-\d{2}-\d{2})[_ ]at[_ ](?P<hour>\d{1,2})[._](?P<minute>\d{2})[._](?P<second>\d{2})[_ ](?P<ampm>AM|PM)",
@@ -100,12 +104,13 @@ def build_manifest(ledger_path: Path) -> tuple[list[ManifestRow], list[dict[str,
     for sha, row in by_sha.items():
         filename = str(row.get("original_filename", "")).strip()
         basename = Path(filename).name
-        if basename in KNOWN_TEST_FILENAMES:
+        exclusion_reason = KNOWN_EXCLUSIONS.get(basename)
+        if exclusion_reason:
             exclusions.append(
                 {
                     "sha256": sha,
                     "original_filename": filename,
-                    "reason": "synthetic_healthcheck_image",
+                    "reason": exclusion_reason,
                     "archived_path": str(row.get("archived_path", "")),
                 }
             )
