@@ -42,13 +42,17 @@ fi
 
 ssh -i "$SSH_KEY" "$REMOTE_HOST" "mkdir -p '$REMOTE_INBOX'"
 
-# Copy each file to the VPS inbox. The VPS collector performs SHA-256 deduplication
-# and archives every observation; this script never deletes source files.
+# Each remote filename is prefixed with the local SHA-256 so two different source
+# folders cannot overwrite one another when they contain the same basename.
+# The VPS collector still performs content-based deduplication and this script
+# never deletes or modifies the source files.
 SENT=0
 while IFS= read -r -d '' FILE; do
   BASENAME="$(basename "$FILE")"
-  echo "[OpenClaw] -> $BASENAME"
-  scp -q -i "$SSH_KEY" "$FILE" "$REMOTE_HOST:$REMOTE_INBOX/"
+  SHA256="$(shasum -a 256 "$FILE" | awk '{print $1}')"
+  REMOTE_NAME="${SHA256}_${BASENAME}"
+  echo "[OpenClaw] -> $REMOTE_NAME"
+  scp -q -i "$SSH_KEY" "$FILE" "$REMOTE_HOST:$REMOTE_INBOX/$REMOTE_NAME"
   SENT=$((SENT + 1))
 done < "$TMP_LIST"
 
