@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -10,6 +11,7 @@ MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "validate_heatse
 spec = importlib.util.spec_from_file_location("validate_heatseeker_velocity", MODULE_PATH)
 module = importlib.util.module_from_spec(spec)
 assert spec.loader is not None
+sys.modules[spec.name] = module
 spec.loader.exec_module(module)
 
 
@@ -55,8 +57,8 @@ def test_one_minute_signed_formula_and_denominator():
         rtol=1e-6,
     )
     row = evidence.iloc[0]
-    assert row["delta_exact"] == True  # noqa: E712
-    assert row["percent_exact__delta_over_prev_signed"] == True  # noqa: E712
+    assert bool(row["delta_exact"])
+    assert bool(row["percent_exact__delta_over_prev_signed"])
     assert np.isclose(row["implicit_denominator"], 1000.0)
 
 
@@ -91,8 +93,8 @@ def test_sign_flip_distinguishes_signed_and_absolute_denominator():
     )
     row = evidence.iloc[0]
     assert row["case"] == "sign_flip"
-    assert row["percent_exact__delta_over_prev_signed"] == True  # noqa: E712
-    assert row["percent_exact__delta_over_prev_abs"] == False  # noqa: E712
+    assert bool(row["percent_exact__delta_over_prev_signed"])
+    assert not bool(row["percent_exact__delta_over_prev_abs"])
     assert np.isclose(row["implicit_denominator"], -100.0)
 
 
