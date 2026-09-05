@@ -3,6 +3,10 @@
 
 H2 was frozen before inspecting ThetaData 2026-08-18 results.
 This is development evidence only, not confirmatory.
+
+IMPORTANT: the target values below are the actual 2026-08-19 GEX screenshot
+published 2026-08-19 13:25 Paris (07:25 ET). An earlier revision mistakenly
+contained values from a different MU card; results from that revision are invalid.
 """
 
 from __future__ import annotations
@@ -13,38 +17,32 @@ import random
 from pathlib import Path
 
 FLOW_FILE = Path("mu_20260818_20260819_160000_volland_like_frozen_v1.json")
-KING = 1000.0
+KING = 950.0
 
-# Transcribed from the user-provided MU GEX screenshot published 2026-08-19 13:25 Paris.
+# Direct transcription from the user-provided MU GEX screenshot.
 # Target column: expiration 2026-08-19. Units: K as displayed by HeatSeeker.
+# Only clearly readable strikes are included.
 HS_GEX = {
-    935.0: 2130.3,
-    940.0: -850.3,
-    942.5: 1491.5,
-    945.0: 981.2,
-    947.5: 776.4,
-    950.0: 454.2,
-    952.5: -441.1,
-    955.0: -763.4,
-    960.0: 606.6,
-    965.0: -753.2,
-    970.0: -1973.4,
-    975.0: -251.5,
-    980.0: -1416.1,
-    985.0: 358.8,
-    990.0: -596.3,
-    995.0: -1878.8,
-    1000.0: 8879.6,
-    1005.0: 129.2,
-    1010.0: 75.9,
-    1015.0: -13.4,
-    1020.0: 189.1,
-    1025.0: 19.9,
-    1030.0: -72.3,
-    1035.0: 9.7,
-    1040.0: 9.4,
-    1045.0: -0.4,
-    1050.0: 233.6,
+    935.0: 552.0,
+    940.0: -317.1,
+    942.5: 0.0,
+    945.0: -298.0,
+    950.0: -2170.2,
+    955.0: 324.9,
+    960.0: 1559.3,
+    962.5: 0.0,
+    965.0: 635.0,
+    970.0: 67.5,
+    975.0: 435.3,
+    980.0: 1352.2,
+    985.0: 116.1,
+    990.0: -626.2,
+    995.0: 370.0,
+    1000.0: 189.2,
+    1005.0: 7.1,
+    1010.0: 48.9,
+    1015.0: 41.8,
+    1020.0: -74.2,
 }
 
 
@@ -133,21 +131,22 @@ def main():
     common = [k for k in sorted(HS_GEX) if k in by_strike]
     ex_king = [k for k in common if k != KING]
 
-    print("MU 2026-08-19 PREMARKET H2 — PRIOR SESSION CARRY")
+    print("MU 2026-08-19 PREMARKET H2 — PRIOR SESSION CARRY — CORRECTED TARGET")
     print("Target card publication: 07:25 ET, before regular-session open.")
     print("Candidate source: 2026-08-18 09:30-16:00 ET signed flow, expiration 2026-08-19.")
+    print("King on actual GEX screenshot: strike 950, value -2170.2K.")
     print("Status: exploratory development; not confirmatory.")
 
     report("ALL COMMON STRIKES", common, by_strike)
-    r, s, l = report("EX-KING 1000 PRIMARY", ex_king, by_strike)
+    r, s, l = report("EX-KING 950 PRIMARY", ex_king, by_strike)
 
     print("\nREFERENCE THRESHOLDS (same numbers as frozen H1, descriptive only)")
     print(f"sign agreement >= 0.65: {'PASS' if s >= 0.65 else 'FAIL'} ({s:.3f})")
     print(f"Spearman(flow,GEX) >= 0.35: {'PASS' if r >= 0.35 else 'FAIL'} ({r:+.3f})")
     print(f"directional lift >= +0.20: {'PASS' if l >= 0.20 else 'FAIL'} ({l:+.3f})")
     print("\nINTERPRETATION")
-    print("A pass would support exploring prior-session carry, not same-day-flow generation of the premarket map.")
-    print("A fail would weaken the simple prior-session carry explanation.")
+    print("A pass supports exploring prior-session carry; a fail weakens that simple explanation.")
+    print("Do not compare these results with the invalid earlier run that used the wrong target card.")
 
 
 if __name__ == "__main__":
