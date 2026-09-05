@@ -1,0 +1,154 @@
+#!/usr/bin/env python3
+"""Exploratory H2: prior-session signed flow vs MU premarket HeatSeeker GEX.
+
+H2 was frozen before inspecting ThetaData 2026-08-18 results.
+This is development evidence only, not confirmatory.
+"""
+
+from __future__ import annotations
+
+import json
+import math
+import random
+from pathlib import Path
+
+FLOW_FILE = Path("mu_20260818_20260819_160000_volland_like_frozen_v1.json")
+KING = 1000.0
+
+# Transcribed from the user-provided MU GEX screenshot published 2026-08-19 13:25 Paris.
+# Target column: expiration 2026-08-19. Units: K as displayed by HeatSeeker.
+HS_GEX = {
+    935.0: 2130.3,
+    940.0: -850.3,
+    942.5: 1491.5,
+    945.0: 981.2,
+    947.5: 776.4,
+    950.0: 454.2,
+    952.5: -441.1,
+    955.0: -763.4,
+    960.0: 606.6,
+    965.0: -753.2,
+    970.0: -1973.4,
+    975.0: -251.5,
+    980.0: -1416.1,
+    985.0: 358.8,
+    990.0: -596.3,
+    995.0: -1878.8,
+    1000.0: 8879.6,
+    1005.0: 129.2,
+    1010.0: 75.9,
+    1015.0: -13.4,
+    1020.0: 189.1,
+    1025.0: 19.9,
+    1030.0: -72.3,
+    1035.0: 9.7,
+    1040.0: 9.4,
+    1045.0: -0.4,
+    1050.0: 233.6,
+}
+
+
+def mean(xs):
+    return sum(xs) / len(xs)
+
+
+def pearson(xs, ys):
+    mx, my = mean(xs), mean(ys)
+    dx = [x - mx for x in xs]
+    dy = [y - my for y in ys]
+    den = math.sqrt(sum(x*x for x in dx) * sum(y*y for y in dy))
+    return float("nan") if den == 0 else sum(x*y for x, y in zip(dx,dy)) / den
+
+
+def ranks(values):
+    pairs = sorted(enumerate(values), key=lambda p: p[1])
+    out = [0.0] * len(values)
+    i = 0
+    while i < len(pairs):
+        j = i + 1
+        while j < len(pairs) and pairs[j][1] == pairs[i][1]:
+            j += 1
+        r = (i + 1 + j) / 2.0
+        for k in range(i, j):
+            out[pairs[k][0]] = r
+        i = j
+    return out
+
+
+def spearman(xs, ys):
+    return pearson(ranks(xs), ranks(ys))
+
+
+def sign_agreement(xs, ys):
+    good = n = 0
+    for x, y in zip(xs, ys):
+        if x == 0 or y == 0:
+            continue
+        n += 1
+        good += int((x > 0) == (y > 0))
+    return good / n if n else float("nan"), good, n
+
+
+def permutation_p(xs, ys, observed, nperm=20000, seed=20260819):
+    rng = random.Random(seed)
+    y = list(ys)
+    extreme = 1
+    for _ in range(nperm):
+        rng.shuffle(y)
+        if abs(spearman(xs, y)) >= abs(observed):
+            extreme += 1
+    return extreme / (nperm + 1)
+
+
+def report(label, strikes, by_strike):
+    flow = [float(by_strike[k]["signed_contract_flow"]) for k in strikes]
+    volume = [float(by_strike[k].get("raw_contract_volume", by_strike[k]["classified_contracts"] + by_strike[k]["unknown_contracts"])) for k in strikes]
+    trades = [float(by_strike[k]["trade_count"]) for k in strikes]
+    gex = [HS_GEX[k] for k in strikes]
+
+    r_flow = spearman(flow, gex)
+    r_vol = spearman(volume, gex)
+    r_trades = spearman(trades, gex)
+    agree, good, n = sign_agreement(flow, gex)
+    lift = r_flow - r_vol
+    pperm = permutation_p(flow, gex, r_flow)
+
+    print(f"\n=== {label} | n={len(strikes)} ===")
+    print(f"Pearson(flow,GEX)        {pearson(flow,gex):+.3f}")
+    print(f"Spearman(flow,GEX)       {r_flow:+.3f}")
+    print(f"Sign agreement           {agree:.3f} ({good}/{n})")
+    print(f"Spearman(volume,GEX)     {r_vol:+.3f}")
+    print(f"Spearman(tradecount,GEX) {r_trades:+.3f}")
+    print(f"Directional lift         {lift:+.3f}")
+    print(f"Permutation p(Spearman)  {pperm:.5f}")
+    return r_flow, agree, lift
+
+
+def main():
+    if not FLOW_FILE.exists():
+        raise SystemExit(f"Missing {FLOW_FILE}. Run the frozen collector first.")
+
+    data = json.loads(FLOW_FILE.read_text())
+    by_strike = {float(r["strike"]): r for r in data["rows"]}
+    common = [k for k in sorted(HS_GEX) if k in by_strike]
+    ex_king = [k for k in common if k != KING]
+
+    print("MU 2026-08-19 PREMARKET H2 — PRIOR SESSION CARRY")
+    print("Target card publication: 07:25 ET, before regular-session open.")
+    print("Candidate source: 2026-08-18 09:30-16:00 ET signed flow, expiration 2026-08-19.")
+    print("Status: exploratory development; not confirmatory.")
+
+    report("ALL COMMON STRIKES", common, by_strike)
+    r, s, l = report("EX-KING 1000 PRIMARY", ex_king, by_strike)
+
+    print("\nREFERENCE THRESHOLDS (same numbers as frozen H1, descriptive only)")
+    print(f"sign agreement >= 0.65: {'PASS' if s >= 0.65 else 'FAIL'} ({s:.3f})")
+    print(f"Spearman(flow,GEX) >= 0.35: {'PASS' if r >= 0.35 else 'FAIL'} ({r:+.3f})")
+    print(f"directional lift >= +0.20: {'PASS' if l >= 0.20 else 'FAIL'} ({l:+.3f})")
+    print("\nINTERPRETATION")
+    print("A pass would support exploring prior-session carry, not same-day-flow generation of the premarket map.")
+    print("A fail would weaken the simple prior-session carry explanation.")
+
+
+if __name__ == "__main__":
+    main()
