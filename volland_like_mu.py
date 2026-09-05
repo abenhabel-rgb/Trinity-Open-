@@ -2,7 +2,7 @@
 """OpenClaw: simple Volland-like dealer-flow test for MU 2026-09-04.
 
 Research estimator only. It does NOT reproduce Volland's proprietary model.
-It uses ThetaData trade+quote history and a conservative quote-edge rule:
+It uses ThetaData v3 option trade_quote and a conservative quote-edge rule:
 - execution near ask => customer buy => dealer sell
 - execution near bid => customer sell => dealer buy
 - otherwise => UNKNOWN
@@ -16,8 +16,9 @@ import json
 import sys
 import urllib.parse
 import urllib.request
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
+from typing import Any
 
 BASE = "http://127.0.0.1:25503/v3"
 SYMBOL = "MU"
@@ -30,7 +31,7 @@ EDGE = 0.10
 OUT = Path("mu_20260904_1227_volland_like.json")
 
 
-def get_json(path: str, params: dict) -> object:
+def get_json(path: str, params: dict[str, Any]) -> object:
     url = BASE + path + "?" + urllib.parse.urlencode(params)
     print("[1/4] ThetaData request")
     print(url)
@@ -38,66 +39,98 @@ def get_json(path: str, params: dict) -> object:
         return json.loads(r.read().decode("utf-8"))
 
 
-def rows_from_payload(payload: object) -> list[dict]:
+def rows_from_payload(payload: object) -> list[dict[str, Any]]:
+    # Current ThetaData v3 JSON is documented as an array of objects.
     if isinstance(payload, list):
-        if not payload:
-            return []
-        if isinstance(payload[0], dict):
-            return payload
+        return [dict(x) for x in payload if isinstance(x, dict)]
 
+    # Keep compatibility with wrapper-style responses.
     if not isinstance(payload, dict):
         raise RuntimeError(f"Unexpected ThetaData JSON type: {type(payload).__name__}")
 
-    data = None
     for key in ("response", "data", "results"):
-        if isinstance(payload.get(key), list):
-            data = payload[key]
-            break
-    if data is None:
-        raise RuntimeError("ThetaData JSON has no response/data/results list")
-    if not data:
-        return []
-    if isinstance(data[0], dict):
-        return data
+        data = payload.get(key)
+        if isinstance(data, list):
+            if not data:
+                return []
+            if isinstance(data[0], dict):
+                return [dict(x) for x in data]
 
-    # ThetaData can return rows as arrays plus a format/header description.
-    header = payload.get("header", {})
-    fmt = None
-    if isinstance(header, dict):
-        for key in ("format", "columns", "fields"):
-            if isinstance(header.get(key), list):
-                fmt = header[key]
-                break
-    if fmt is None and isinstance(payload.get("format"), list):
-        fmt = payload["format"]
-    if fmt is None:
-        raise RuntimeError("ThetaData returned array rows but no column format was found")
+            # Legacy/alternate array rows plus column metadata.
+            header = payload.get("header", {})
+            fmt = None
+            if isinstance(header, dict):
+                for fmt_key in ("format", "columns", "fields"):
+                    if isinstance(header.get(fmt_key), list):
+                        fmt = header[fmt_key]
+                        break
+            if fmt is None and isinstance(payload.get("format"), list):
+                fmt = payload["format"]
+            if fmt is None:
+                raise RuntimeError("ThetaData returned array rows but no column format was found")
 
-    names = []
-    for item in fmt:
-        if isinstance(item, str):
-            names.append(item)
-        elif isinstance(item, dict):
-            names.append(str(item.get("name") or item.get("field") or item.get("column")))
-        else:
-            names.append(str(item))
-    return [dict(zip(names, row)) for row in data]
+            names: list[str] = []
+            for item in fmt:
+                if isinstance(item, str):
+                    names.append(item)
+                elif isinstance(item, dict):
+                    names.append(str(item.get("name") or item.get("field") or item.get("column")))
+                else:
+                    names.append(str(item))
+            return [dict(zip(names, row)) for row in data]
+
+    raise RuntimeError("ThetaData JSON has no response/data/results list")
 
 
-def pick(row: dict, *names: str):
-    lower = {str(k).lower(): v for k, v in row.items()}
+def flatten(obj: Any, prefix: str = "") -> dict[str, Any]:
+    """Flatten nested ThetaData rows while preserving full dotted paths."""
+    out: dict[str, Any] = {}
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            key_s = str(key)
+            full = f"{prefix}.{key_s}" if prefix else key_s
+            if isinstance(value, dict):
+                out.update(flatten(value, full))
+            else:
+                out[full.lower()] = value
+                # Add unqualified leaf only if it does not already exist.
+                out.setdefault(key_s.lower(), value)
+    return out
+
+
+def pick(row: dict[str, Any], *names: str) -> Any:
+    flat = flatten(row)
     for name in names:
-        if name.lower() in lower:
-            return lower[name.lower()]
+        key = name.lower()
+        if key in flat and flat[key] is not None:
+            return flat[key]
+    # Last resort: dotted path ending in the requested leaf.
+    for name in names:
+        suffix = "." + name.lower()
+        matches = [v for k, v in flat.items() if k.endswith(suffix) and v is not None]
+        if len(matches) == 1:
+            return matches[0]
     raise KeyError(" / ".join(names))
 
 
-def f(row: dict, *names: str) -> float:
-    return float(pick(row, *names))
+def num(row: dict[str, Any], *names: str) -> float:
+    value = pick(row, *names)
+    if isinstance(value, str):
+        value = value.replace(",", "").replace("$", "").strip()
+    return float(value)
 
 
-def i(row: dict, *names: str) -> int:
-    return int(float(pick(row, *names)))
+def integer(row: dict[str, Any], *names: str) -> int:
+    return int(num(row, *names))
+
+
+def parse_market_row(row: dict[str, Any]) -> tuple[float, int, float, float, float]:
+    strike = num(row, "strike", "contract.strike", "option.strike")
+    size = integer(row, "size", "trade.size", "trade_size", "trade_size_contracts")
+    price = num(row, "price", "trade.price", "trade_price")
+    bid = num(row, "bid", "quote.bid", "bid_price", "quote.bid_price")
+    ask = num(row, "ask", "quote.ask", "ask_price", "quote.ask_price")
+    return strike, size, price, bid, ask
 
 
 def main() -> int:
@@ -139,20 +172,26 @@ def main() -> int:
     classified_contracts = 0
     unknown_contracts = 0
     bad_rows = 0
+    failures: Counter[str] = Counter()
+    first_bad: tuple[dict[str, Any], str] | None = None
 
     for row in rows:
         try:
-            strike = f(row, "strike")
-            size = i(row, "size", "trade_size", "trade_size_contracts")
-            price = f(row, "price", "trade_price")
-            bid = f(row, "bid", "bid_price")
-            ask = f(row, "ask", "ask_price")
-        except Exception:
+            strike, size, price, bid, ask = parse_market_row(row)
+        except Exception as exc:
             bad_rows += 1
+            failures[f"parse:{type(exc).__name__}:{exc}"] += 1
+            if first_bad is None:
+                first_bad = (row, repr(exc))
             continue
 
-        if size <= 0 or ask < bid:
+        if size <= 0:
             bad_rows += 1
+            failures["invalid_size"] += 1
+            continue
+        if ask < bid:
+            bad_rows += 1
+            failures["crossed_quote"] += 1
             continue
 
         b = buckets[strike]
@@ -166,11 +205,9 @@ def main() -> int:
 
         loc = (price - bid) / spread
         if loc >= 1.0 - EDGE:
-            # customer buys -> dealer sells
-            sign = -1
+            sign = -1  # customer buy -> dealer sell
         elif loc <= EDGE:
-            # customer sells -> dealer buys
-            sign = 1
+            sign = 1   # customer sell -> dealer buy
         else:
             sign = 0
 
@@ -182,6 +219,17 @@ def main() -> int:
             classified_contracts += size
             b["signed_contract_flow"] += sign * size
             b["signed_premium_notional"] += sign * size * price * 100.0
+
+    if bad_rows == len(rows):
+        print("ERROR: ThetaData returned rows, but none could be parsed.", file=sys.stderr)
+        print("This is a schema/parsing problem, NOT a zero-flow market result.", file=sys.stderr)
+        if first_bad is not None:
+            row, err = first_bad
+            print(f"FIRST PARSE ERROR: {err}", file=sys.stderr)
+            print("FIRST ROW KEYS:", sorted(flatten(row).keys()), file=sys.stderr)
+            print("FIRST ROW SAMPLE:", json.dumps(row, indent=2)[:4000], file=sys.stderr)
+        print("FAILURE COUNTS:", dict(failures.most_common(5)), file=sys.stderr)
+        return 4
 
     out_rows = []
     for strike in sorted(buckets):
