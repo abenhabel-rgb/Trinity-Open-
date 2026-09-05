@@ -39,12 +39,30 @@ def get_json(path: str, params: dict[str, Any]) -> object:
         return json.loads(r.read().decode("utf-8"))
 
 
-def rows_from_payload(payload: object) -> list[dict[str, Any]]:
-    # Current ThetaData v3 JSON is documented as an array of objects.
-    if isinstance(payload, list):
-        return [dict(x) for x in payload if isinstance(x, dict)]
+def explode_contract_data(items: list[Any]) -> list[dict[str, Any]]:
+    """ThetaData v3 often returns [{contract:{...}, data:[{trade...}, ...]}, ...]."""
+    out: list[dict[str, Any]] = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        contract = item.get("contract")
+        data = item.get("data")
+        if isinstance(contract, dict) and isinstance(data, list):
+            for event in data:
+                if not isinstance(event, dict):
+                    continue
+                row = dict(event)
+                row["contract"] = dict(contract)
+                out.append(row)
+        else:
+            out.append(dict(item))
+    return out
 
-    # Keep compatibility with wrapper-style responses.
+
+def rows_from_payload(payload: object) -> list[dict[str, Any]]:
+    if isinstance(payload, list):
+        return explode_contract_data(payload)
+
     if not isinstance(payload, dict):
         raise RuntimeError(f"Unexpected ThetaData JSON type: {type(payload).__name__}")
 
@@ -54,9 +72,8 @@ def rows_from_payload(payload: object) -> list[dict[str, Any]]:
             if not data:
                 return []
             if isinstance(data[0], dict):
-                return [dict(x) for x in data]
+                return explode_contract_data(data)
 
-            # Legacy/alternate array rows plus column metadata.
             header = payload.get("header", {})
             fmt = None
             if isinstance(header, dict):
@@ -83,7 +100,6 @@ def rows_from_payload(payload: object) -> list[dict[str, Any]]:
 
 
 def flatten(obj: Any, prefix: str = "") -> dict[str, Any]:
-    """Flatten nested ThetaData rows while preserving full dotted paths."""
     out: dict[str, Any] = {}
     if isinstance(obj, dict):
         for key, value in obj.items():
@@ -93,7 +109,6 @@ def flatten(obj: Any, prefix: str = "") -> dict[str, Any]:
                 out.update(flatten(value, full))
             else:
                 out[full.lower()] = value
-                # Add unqualified leaf only if it does not already exist.
                 out.setdefault(key_s.lower(), value)
     return out
 
@@ -104,7 +119,6 @@ def pick(row: dict[str, Any], *names: str) -> Any:
         key = name.lower()
         if key in flat and flat[key] is not None:
             return flat[key]
-    # Last resort: dotted path ending in the requested leaf.
     for name in names:
         suffix = "." + name.lower()
         matches = [v for k, v in flat.items() if k.endswith(suffix) and v is not None]
@@ -125,11 +139,11 @@ def integer(row: dict[str, Any], *names: str) -> int:
 
 
 def parse_market_row(row: dict[str, Any]) -> tuple[float, int, float, float, float]:
-    strike = num(row, "strike", "contract.strike", "option.strike")
-    size = integer(row, "size", "trade.size", "trade_size", "trade_size_contracts")
-    price = num(row, "price", "trade.price", "trade_price")
-    bid = num(row, "bid", "quote.bid", "bid_price", "quote.bid_price")
-    ask = num(row, "ask", "quote.ask", "ask_price", "quote.ask_price")
+    strike = num(row, "contract.strike", "strike")
+    size = integer(row, "size")
+    price = num(row, "price")
+    bid = num(row, "bid")
+    ask = num(row, "ask")
     return strike, size, price, bid, ask
 
 
@@ -155,7 +169,7 @@ def main() -> int:
         print("If this says connection refused, Theta Terminal is not running.", file=sys.stderr)
         return 2
 
-    print(f"[2/4] rows received: {len(rows)}")
+    print(f"[2/4] trade rows received: {len(rows)}")
     if not rows:
         print("ERROR: no trade_quote rows returned", file=sys.stderr)
         return 3
@@ -205,9 +219,9 @@ def main() -> int:
 
         loc = (price - bid) / spread
         if loc >= 1.0 - EDGE:
-            sign = -1  # customer buy -> dealer sell
+            sign = -1
         elif loc <= EDGE:
-            sign = 1   # customer sell -> dealer buy
+            sign = 1
         else:
             sign = 0
 
@@ -221,8 +235,7 @@ def main() -> int:
             b["signed_premium_notional"] += sign * size * price * 100.0
 
     if bad_rows == len(rows):
-        print("ERROR: ThetaData returned rows, but none could be parsed.", file=sys.stderr)
-        print("This is a schema/parsing problem, NOT a zero-flow market result.", file=sys.stderr)
+        print("ERROR: ThetaData returned trade rows, but none could be parsed.", file=sys.stderr)
         if first_bad is not None:
             row, err = first_bad
             print(f"FIRST PARSE ERROR: {err}", file=sys.stderr)
@@ -259,7 +272,7 @@ def main() -> int:
             "call_put_sign_assumption": False,
         },
         "summary": {
-            "source_rows": len(rows),
+            "source_trade_rows": len(rows),
             "bad_rows": bad_rows,
             "total_contracts": total_contracts,
             "classified_contracts": classified_contracts,
